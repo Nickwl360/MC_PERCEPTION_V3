@@ -1,0 +1,2 @@
+from mc_perception_inferred_model_class import brain_model
+
