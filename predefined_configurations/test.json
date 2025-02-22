@@ -1,0 +1,15 @@
+{
+    "workflow_settings": [
+      {
+
+      }
+    ],
+    "_comment": "workflow indices: 0: find critical points, 1: Find spinodal/binodal, 2: Save results automatically, 3: Load_saved_data (not working), 4:add_salt_dependence (not working)",
+
+    "workflow_indices":[0,1,2],
+    "protein_selection": [25,26],
+    "manual_w2": false,
+    "salt_activated": false,
+    "salt_mM_values": [0,100,200,300,500,1000]
+
+}
