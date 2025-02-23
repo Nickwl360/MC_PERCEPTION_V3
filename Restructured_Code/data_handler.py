@@ -61,10 +61,10 @@ class DataHandler:
         print(f"Loaded {category}/{filename}.npz")
         return data
 
-    def save_mat(self, category, filename, data):
+    def save_mat(self, category, filename, data,do_compression=True):
         """Saves data to a MATLAB file."""
         path = self._get_path(category, filename, "mat")
-        sio.savemat(path, data)
+        sio.savemat(path, data,do_compression=do_compression)
         print(f"Saved {category}/{filename}.mat")
 
     def load_mat(self, category, filename):

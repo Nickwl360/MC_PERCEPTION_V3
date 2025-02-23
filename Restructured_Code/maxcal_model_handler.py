@@ -122,14 +122,15 @@ class BrainModel:
     def save_trajectory(self):
 
         As, Bs, Cs, Ds = self.long_trajectory[0]
-        dict_data= {
-            "A": As,
-            "B": Bs,
-            "C": Cs,
-            "D": Ds
+        dict_data = {
+            "A": As.astype(np.int8),
+            "B": Bs.astype(np.int8),
+            "C": Cs.astype(np.int8),
+            "D": Ds.astype(np.int8)
         }
-        self.dh.save_mat("trajectories", f"{self.prefix}trajectory", dict_data)
+        self.dh.save_mat("trajectories", f"{self.prefix}trajectory", dict_data, do_compression=False)
         return
+
     def load_trajectory(self):
         try:
             if self.joch_data:

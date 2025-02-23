@@ -130,11 +130,6 @@ def comparitive_workflow():
 
 
 
-
-
-
-
-
 if __name__ == '__main__':
     #testing
     model = mc.BrainModel('075', 11, 26, 0.0002)
@@ -144,6 +139,12 @@ if __name__ == '__main__':
     model.find_model()
     model.load_params()
     print(model.params)
+
+    model = mc.BrainModel('075', 11, 26, 0.0001)
+    model.load_trajectory()
+    model.save_trajectory()
+
+
     #
     # model.dh.save_csv('parameters', f'{model.prefix}params',
     #               [['I', 'Parameters']] + pd.DataFrame({'I': [model.I], 'params': [parameters]}).values.tolist())
