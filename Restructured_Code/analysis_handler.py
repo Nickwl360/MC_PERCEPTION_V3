@@ -216,6 +216,8 @@ class AnalysisHandler:
             self.dh.save_npz('densities', f'{self.prefix}countsXYYb', counts=self.countXYYb)
         if self.average_trajectories is not None:
             self.dh.save_npz('average_trajectories', f'{self.prefix}Tper{self.Tper}Ntraj{self.Ntraj}average_trajectories', **self.average_trajectories)
+        if self.gamma_dist is not None:
+            self.dh.save_npz('densities', f'{self.prefix}distributions', gamma_dist=self.gamma_dist, lower_dist=self.lower_dist, ac_dist=self.ac_dist, ad_dist=self.ad_dist)
 
 
     # # # Trajectory Analysis # # #
@@ -254,6 +256,7 @@ class AnalysisHandler:
         except FileNotFoundError:
             print('No trajectory density found, calculating now')
             self.countXYXb, self.countXYYb = get_shifted_trajectory_densities(self.shifted_trajectory, self.u_space)
+            self.save_all()
     def load_or_generate_avg_trajectory(self, Tper, Ntraj):
         self.Tper = Tper
         self.Ntraj = Ntraj
@@ -271,8 +274,7 @@ class AnalysisHandler:
         except FileNotFoundError:
             print('No distributions found, calculating now')
             self.gamma_dist, self.lower_dist, self.ac_dist, self.ad_dist = self.compute_distributions()
-            self.dh.save_npz('densities', f'{self.prefix}distributions', gamma_dist=gamma_dist, lower_dist=lower_dist, ac_dist=ac_dist, ad_dist=ad_dist)
-        return self.gamma_dist, self.lower_dist, self.ac_dist, self.ad_dist
+            self.save_all()
 
 
     def compute_average_trajectories(self):
