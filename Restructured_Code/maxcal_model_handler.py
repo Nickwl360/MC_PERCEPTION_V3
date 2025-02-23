@@ -19,7 +19,7 @@ class BrainModel:
         self.VC = VC
         self.dt = dt
 
-        self.ndt = int(self.dt/0.0001)
+        self.ndt = 1#int(self.dt/0.0001)
         print( 'THIS IS NDT',self.ndt)
 
         self.params = None
@@ -57,8 +57,8 @@ class BrainModel:
 
     def find_model(self, initial_guess=None):
 
-        self.initial_guess =   (-10.813039700214725, -10.493275942310733, -8.467808763513434, -3.440305398445934, 0.8102093637779607,
-        1.8747257423529846, 2.686201028042257, 0.11667559074547738, 0.7218451091627106 ) if initial_guess is None else initial_guess
+        self.initial_guess =   (-10.813039700214725, -10.493275942310733, -8.467808763513434, -3.440305398445934, 0.1,
+        1., 2., 0.1, 0.1 ) if initial_guess is None else initial_guess
 
         #check if counts file exists
         counts_path = self.dh._get_path('counts', f'{self.prefix}counts', 'npy')
@@ -71,13 +71,15 @@ class BrainModel:
             ###############
             ############
             #############
-            self.joch_mat_data = self.dh.load_mat('joch_data', f'TwoChoiceTrajectoriesSmallStepDensity_{self.I}')
+            #self.joch_mat_data = self.dh.load_mat('joch_data', f'TwoChoiceTrajectoriesSmallStepDensity_{self.I}')
+            self.joch_mat_data = self.dh.load_mat('joch_data', f'TwoChoiceTrajectoriesDT0002Density_{self.I}')
 
             # Sample data points based on dt
             a = self.joch_mat_data['r_li'][0][::self.ndt]
             b = self.joch_mat_data['r_li'][1][::self.ndt]
             c = self.joch_mat_data['r_li'][0][::self.ndt]
             d = self.joch_mat_data['r_li'][1][::self.ndt]
+            print(len(a))
 
             count = mc.count_transitions((a, b, c, d))
             self.dh.save_npy('counts', f'{self.prefix}counts', count)
@@ -88,7 +90,9 @@ class BrainModel:
         print(f'Inferred parameters: {maxparams}')
         self.params = maxparams
         # save_inferred_model_csv(self.I_test,f'VC_{self.VC}_HC_{self.HC}',self.params)
-        self.dh.save_csv('parameters', f'{self.prefix}params', pd.DataFrame({'params': [self.params]}))
+
+        self.dh.save_csv('parameters', f'{self.prefix}params',
+                          [['I', 'parameters']] + pd.DataFrame({'I': [self.I], 'params': [self.params]}).values.tolist())
         return
 
     #forward modelling

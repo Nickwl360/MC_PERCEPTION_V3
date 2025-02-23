@@ -189,6 +189,7 @@ class AnalysisHandler:
         self.countXYXb = None
         self.countXYYb = None
         self.average_trajectories = None
+        self.gamma_dist, self.lower_dist, self.ac_dist, self.ad_dist = None, None, None, None
 
     def get_shifted_trajectory_and_space(self):
 
@@ -233,6 +234,7 @@ class AnalysisHandler:
             print('No dominance statistics found, calculating now')
             # convert As,Bs to 2 dd array of dtype int8
             As, Bs = np.array(As, dtype=np.int8), np.array(Bs, dtype=np.int8)
+
             R_ki = np.array([As, Bs])
             Duration, Variance, CV, Skewness, Sequential, RevCount, Pdouble, Pneither = extract_dominance_statistics(
                 self.dt, R_ki, NR=[[self.maxtop - 1]])
@@ -250,7 +252,7 @@ class AnalysisHandler:
                 'Pneither': Pneither
             }
             self.save_all()
-    def load_or_generate_trajectory_density(self):
+    def load_or_generate_trajectory_density(self) -> None:
         try:
             self.countXYXb, self.countXYYb = self.dh.load_npz('densities', f'{self.prefix}countsXYXb'), self.dh.load_npz('densities', f'{self.prefix}countsXYYb')
         except FileNotFoundError:

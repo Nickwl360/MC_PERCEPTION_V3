@@ -3,6 +3,7 @@ import configuration_manager as cm
 import maxcal_model_handler as mc
 from analysis_handler import AnalysisHandler
 from plot_handler import PlotHandler
+import pandas as pd
 
 
 
@@ -95,7 +96,7 @@ def analyze_all(traj,model):
     plotter.plot_avg_trajectories()
     plotter.plot_distributions()
 
-def test_comparitive_workflow():
+def comparitive_workflow():
     control_model_mc = mc.BrainModel('075', 11, 26, 0.0001)
     control_model_mc.load_params()
     control_model_mc.load_trajectory()
@@ -136,20 +137,29 @@ def test_comparitive_workflow():
 
 if __name__ == '__main__':
     #testing
-    model = mc.BrainModel('075', 11, 26, 0.0001)
+    model = mc.BrainModel('075', 11, 26, 0.0002)
+    #model.find_model()
+   #  parameters v1=  [-11.21441075  ,-9.17350676, -12.56330495 ,  0.41337435 , 19.89311771, #wack ass kcoop
+   # 7.8307939  ,-18.78255287  ,-0.07484337 , -8.09972307]
+    model.find_model()
     model.load_params()
-    _=model.generate_trajectory((0,0,0,0), 8000)
-    model.save_trajectory()
-    model.load_trajectory()
-    traj = model.long_trajectory
+    print(model.params)
+    #
+    # model.dh.save_csv('parameters', f'{model.prefix}params',
+    #               [['I', 'Parameters']] + pd.DataFrame({'I': [model.I], 'params': [parameters]}).values.tolist())
+    # model.load_params()
+    # _=model.generate_trajectory((0,0,0,0), 4000)
+    # model.save_trajectory()
+    # model.load_trajectory()
+    # traj = model.long_trajectory
 
-    analysis =  AnalysisHandler(traj,model)
-    analysis.load_or_generate_dominance_statistics()
-    analysis.load_or_generate_trajectory_density()
-    analysis.load_or_generate_avg_trajectory(Tper=.1,Ntraj=20)
+    # analysis =  AnalysisHandler(traj,model)
+    # analysis.load_or_generate_dominance_statistics()
+    #analysis.load_or_generate_trajectory_density()
+    ##analysis.load_or_generate_avg_trajectory(Tper=.1,Ntraj=20)
 
-    plotter =  PlotHandler(analysis)
-    plotter.plot_avg_trajectories()
+    #plotter =  PlotHandler(analysis)
+    #plotter.plot_avg_trajectories()
     #print(analysis.dominance_statistics)
     # print(analysis.shifted_trajectory)
 

@@ -79,6 +79,8 @@ class DataHandler:
     def save_csv(self, category, filename, data):
         """Saves data to a CSV file."""
         path = self._get_path(category, filename, "csv")
+        if isinstance(data, pd.DataFrame):
+            data.to_csv(path, index=False,header=True)
         with open(path, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(data)
