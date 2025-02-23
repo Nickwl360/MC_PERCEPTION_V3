@@ -9,7 +9,7 @@ M_step = 1
 
 
 def get_params(Itest,VC,HC):
-    dir_path = 'Infered_parameters'
+    dir_path = '../Infered_parameters'
     file_name = f'{Itest}_inferred_params'
     file_name = f'{Itest}_VC_{VC}_HC_{HC}_inferred_paramsV2'
 

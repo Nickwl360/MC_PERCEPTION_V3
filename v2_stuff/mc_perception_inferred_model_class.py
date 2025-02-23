@@ -1,13 +1,13 @@
 from mc_perception_frwd_cl import simulation_nopij
 from mc_perception_analyzer_functions import extract_dominance_statistics,compute_average_trajectories,save_analysis,load_analysis,get_shifted_trajectory_densities,get_shifted_trajectory_and_space
-from data_inferred_chunker import chunk_and_save_data, load_chunked_data
+from v2_stuff.data_inferred_chunker import chunk_and_save_data, load_chunked_data
 from mc_plotter import plot_2d_trajectory,view_trajectory_density_xyxb,view_trajectory_density_xyyb,view_avg_trajectories
 from mc_perception_model_finder import maximize_likelyhood,save_inferred_model_csv,count_transitions, load_mat_data
 import os
 import numpy as np
 import pandas as pd
 import ast
-import scipy.io as sio
+
 """ Class for brain model, holds long_trajectory and provides methods for trajectory generation, analysis, and plotting. """
 
 class brain_model:

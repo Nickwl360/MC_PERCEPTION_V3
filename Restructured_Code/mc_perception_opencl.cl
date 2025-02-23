@@ -12,7 +12,7 @@ double stirling(double x){
     }
 }
 
-double newcomb(double N, double L) {
+double combination(double N, double L) {
     int a = N;
     int b = L;
     double n = N;
@@ -30,8 +30,11 @@ double newcomb(double N, double L) {
     }
 
 double calcP(double NA, double NB, double NC, double ND, double la,double lA,double lb, double lB, double lgamma, double lc, double ldelta, double ld,double halpha, double hA, double hbeta, double hB, double hgamma,double hdelta, double hc, double hd, double kcoop,double kcomp, double kdu, double kud, double kx){
-    double e = (halpha * (la - ((MAXTOP-NA)/2)) + hbeta * (lb - ((MAXTOP-NB)/2)) + hgamma*(lgamma-((MAXBOT-NC))/2) + hdelta*(ldelta-(MAXBOT-ND)/2) + hA * (lA-NA/2) + hB*(lB-NB/2) + hc*(lc-NC/2)+hd*(ld-ND/2) + kcoop*((la-lA)*NA - (MAXTOP*NA/2) + (lb-lB)*NB- (MAXTOP*NB/2)) + kcomp*((lA-la)*NB -(MAXTOP*NB/2) + (lB-lb)*NA - (MAXTOP*NA/2)) + kdu*((la-lA)*NC - (NC*MAXTOP/2) +(lb-lB)*ND -(ND*MAXTOP/2)) + kud*(NA*(lc-lgamma)-(NA*MAXBOT/2)+NB*(ld-ldelta)-(NB*MAXBOT/2))+kx*((lB-lb)*NC-(NC*MAXTOP/2)+(lA-la)*ND-(ND*MAXTOP/2)));
-    double sum = (newcomb(MAXTOP-1-NA,la) + newcomb(MAXTOP-1-NB,lb)+ newcomb(NA, lA) + newcomb(NB, lB) + newcomb(MAXBOT-1-NC,lgamma) + newcomb(NC,lc) + newcomb(MAXBOT-1-ND,ldelta) + newcomb(ND,ld) + e);
+
+    //Gives Probability of (la,lA,lb,lB,lgamma,lc,ldelta,ld) given (NA,NB,NC,ND)
+
+    double Hamiltonian = (halpha * (la - ((MAXTOP-NA)/2)) + hbeta * (lb - ((MAXTOP-NB)/2)) + hgamma*(lgamma-((MAXBOT-NC))/2) + hdelta*(ldelta-(MAXBOT-ND)/2) + hA * (lA-NA/2) + hB*(lB-NB/2) + hc*(lc-NC/2)+hd*(ld-ND/2) + kcoop*((la-lA)*NA - (MAXTOP*NA/2) + (lb-lB)*NB- (MAXTOP*NB/2)) + kcomp*((lA-la)*NB -(MAXTOP*NB/2) + (lB-lb)*NA - (MAXTOP*NA/2)) + kdu*((la-lA)*NC - (NC*MAXTOP/2) +(lb-lB)*ND -(ND*MAXTOP/2)) + kud*(NA*(lc-lgamma)-(NA*MAXBOT/2)+NB*(ld-ldelta)-(NB*MAXBOT/2))+kx*((lB-lb)*NC-(NC*MAXTOP/2)+(lA-la)*ND-(ND*MAXTOP/2)));
+    double sum = (combination(MAXTOP-1-NA,la) + combination(MAXTOP-1-NB,lb)+ combination(NA, lA) + combination(NB, lB) + combination(MAXBOT-1-NC,lgamma) + combination(NC,lc) + combination(MAXBOT-1-ND,ldelta) + combination(ND,ld) + Hamiltonian);
     return sum;
 }
 
@@ -42,15 +45,21 @@ __kernel void calc_next_state(__global double* Result, __global double* Params, 
      const double EXP_UPPER_LIMIT = 650;  // Approx ln(DBL_MAX)
      const double EXP_LOWER_LIMIT = -650; // Approx ln(DBL_MIN)
 
+         //get next state values from linear index
+
      int nam = i/(MAXTOP*MAXBOT*MAXBOT)%MAXTOP;
      int nbn = i/(MAXBOT*MAXBOT)%MAXTOP;
      int nco = i/MAXBOT%MAXBOT;
      int ndp = i%MAXBOT;
 
+         //unpack starting state
+
      int nai = current_state[0];
      int nbj = current_state[1];
      int nck = current_state[2];
      int ndl = current_state[3];
+
+        //unpack parameters
 
      double halpha = Params[0];
      double ha = Params[1];
@@ -67,8 +76,11 @@ __kernel void calc_next_state(__global double* Result, __global double* Params, 
      double kx = Params[12];
 
 
-     double pvalue=0;   //a=lA, b=lB, c=lC,d=lD, e=la,f=lb,g=lc,h=ld
-     double loop4 = 0;
+     double Pls =0;
+     double Pij = 0;
+
+        //a=lA, b=lB, c=lC,d=lD, e=la,f=lb,g=lc,h=ld
+
      for(int a=0; a<=nai;a++)
      {
         for(int b=0; b<=nbj;b++)
@@ -80,15 +92,16 @@ __kernel void calc_next_state(__global double* Result, __global double* Params, 
                     int e = nam - nai + a;  //lalpha
                     int f = nbn - nbj + b;  //lbeta
                     int g = nco - nck + c;  //lgamma
-                    int h = ndp - ndl + d; // ldelta
+                    int h = ndp - ndl + d;  // ldelta
                     if(0 <= e && e <= (MAXTOP-1-nai) && 0 <= f && f <= (MAXTOP-1-nbj) && 0 <= g && g <= (M) && 0 <= h && h <= (M) )
                     //if(0 <= e && e <= (M) && 0 <= f && f <= (M) && 0 <= g && g <= (M) && 0 <= h && h <= (M) )
 
                     {
 
-                        pvalue = calcP(nai,nbj,nck,ndl, e,a,f,b,g,c,h,d, halpha,ha,hbeta,hb,hgamma,hdelta,hc,hd,kcoop,kcomp,kdu,kup,kx);
-                        pvalue = fmax(fmin(pvalue, EXP_UPPER_LIMIT), EXP_LOWER_LIMIT);
-                        loop4 +=  exp(pvalue);
+                        Pls = calcP(nai,nbj,nck,ndl, e,a,f,b,g,c,h,d, halpha,ha,hbeta,hb,hgamma,hdelta,hc,hd,kcoop,kcomp,kdu,kup,kx);
+
+                        Pls = fmax(fmin(Pls, EXP_UPPER_LIMIT), EXP_LOWER_LIMIT);
+                        Pij +=  exp(Pls);
 
                     }
                 }
@@ -99,7 +112,7 @@ __kernel void calc_next_state(__global double* Result, __global double* Params, 
         }
 
     }
-    Result[i] = loop4;
+    Result[i] = Pij;
 }
 
 

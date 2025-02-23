@@ -31,8 +31,8 @@ def load_chunked_data(model,letter, short = False):
 
 if __name__ == '__main__':
 
-    if not os.path.exists('inferred_trajectories'):
-        os.makedirs('inferred_trajectories')
+    if not os.path.exists('../inferred_trajectories'):
+        os.makedirs('../inferred_trajectories')
 
     # for data_file in os.listdir(large_data_dir):
     #     #remove the .npy extension

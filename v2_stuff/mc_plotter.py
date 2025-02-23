@@ -336,7 +336,7 @@ def view_avg_trajectories(model):
     ax1.view_init(elev=38, azim=-41)
 
     #save plot to 'trajectory_plots' dir
-    dir = 'trajectory_plots'
+    dir = '../trajectory_plots'
     os.makedirs(dir, exist_ok=True)
     if model.joch_data:
         plt.savefig(f'{dir}/JOCH_DATA_L{model.L_per_traj}N{model.Nrepeat}_I{model.I_test}.png', dpi=300)

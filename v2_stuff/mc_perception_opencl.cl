@@ -1,4 +1,4 @@
- #define MAXTOP 11
+#define MAXTOP 11
 #define MAXBOT 26
 #define PI 3.14159265358979323846
 #define M 1

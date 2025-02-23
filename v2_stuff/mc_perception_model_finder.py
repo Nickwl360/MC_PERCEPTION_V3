@@ -200,7 +200,7 @@ def save_inferred_model_csv(I_test, label, params):
 
 
     params_names = ['hgamma', 'hc', 'halpha', 'ha', 'kcoop', 'kcomp', 'kdu', 'kud', 'kx']
-    dir_path = 'Infered_parameters'
+    dir_path = '../Infered_parameters'
     os.makedirs(dir_path, exist_ok=True)
 
     #file_path = os.path.join(dir_path, f'{I_test}_inferred_params.csv')
