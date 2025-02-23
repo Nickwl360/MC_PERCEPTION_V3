@@ -87,12 +87,12 @@ class BrainModel:
             print('FOUND COUNTS AND SAVED')
 
         maxparams = mc.maximize_likelyhood(self, count, self.initial_guess)
+
         print(f'Inferred parameters: {maxparams}')
         self.params = maxparams
-        # save_inferred_model_csv(self.I_test,f'VC_{self.VC}_HC_{self.HC}',self.params)
 
         self.dh.save_csv('parameters', f'{self.prefix}params',
-                          [['I', 'parameters']] + pd.DataFrame({'I': [self.I], 'params': [self.params]}).values.tolist())
+                          [['I', 'parameters']] + pd.DataFrame({'I': [self.I], 'params': [','.join(map(str, self.params))]}).values.tolist())
         return
 
     #forward modelling
@@ -128,7 +128,7 @@ class BrainModel:
             "C": Cs.astype(np.int8),
             "D": Ds.astype(np.int8)
         }
-        self.dh.save_mat("trajectories", f"{self.prefix}trajectory", dict_data, do_compression=False)
+        self.dh.save_mat("trajectories", f"{self.prefix}trajectory", dict_data, do_compression=True)
         return
 
     def load_trajectory(self):

@@ -222,7 +222,6 @@ class PlotHandler:
             plt.show()
 
             return
-
     def plot_avg_trajectories(self):
         """
         Plot the trajectory in 3D space with colored lines based on input data.
@@ -373,7 +372,7 @@ class PlotHandler:
         self.dh.save_fig('plots', f'{self.prefix}Tper{self.ah.Tper}Ntraj{self.ah.Ntraj}avg_traj', plt)
         # fix start view angle
         plt.show()
-
+        self.close_plots()
     def plot_distributions(self):
         gamma_dist, lower_dist, ac_dist, ad_dist = self.ah.gamma_dist, self.ah.lower_dist, self.ah.ac_dist, self.ah.ad_dist
 
@@ -408,3 +407,7 @@ class PlotHandler:
         plt.tight_layout()
         self.dh.save_fig('plots', f'{self.prefix}distributions', plt)
         plt.show()
+        self.close_plots()
+
+    def close_plots(self):
+        plt.close('all')
