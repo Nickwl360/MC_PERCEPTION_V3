@@ -1,15 +1,34 @@
 {
-    "workflow_settings": [
-      {
-
-      }
-    ],
-    "_comment": "workflow indices: 0: find critical points, 1: Find spinodal/binodal, 2: Save results automatically, 3: Load_saved_data (not working), 4:add_salt_dependence (not working)",
-
-    "workflow_indices":[0,1,2],
-    "protein_selection": [25,26],
-    "manual_w2": false,
-    "salt_activated": false,
-    "salt_mM_values": [0,100,200,300,500,1000]
+  "settings": {
+    "NR": 11,
+    "NE": 26,
+    "I": "075",
+    "dt": 0.0001,
+    "HC": 100,
+    "VC": 100,
+    "joch_data": false
+  },
+  "workflow":
+  {
+    "parameters":{
+      "mode": "load",
+      "save_if_inferred": true,
+      "initial_guess": false
+    },
+    "trajectory":
+    {
+      "mode": "load",
+      "save_if_generated": true,
+      "length": 8000
+    },
+    "densities":
+    {
+      "mode": "load",
+      "save_if_generated": true,
+    },
+    "average_distributions": "load",
+    "average_trajectory": "load",
+    "save_all": true
+  }
 
 }

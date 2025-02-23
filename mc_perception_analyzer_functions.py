@@ -209,28 +209,6 @@ def get_shifted_trajectory_and_space(trajectory_long):
 
     return shifted_trajectory, u_space
 
-def get_shifted_trajectory_densities(shifted_trajectory, u_space):
-
-    X_i, Y_i, Xb_i, Yb_i = shifted_trajectory
-    uX, uY, uXb, uYb = u_space
-    uX,uY,uXb,uYb = np.array(uX),np.array(uY),np.array(uXb),np.array(uYb)
-
-    countXYXb = np.zeros((len(uX), len(uY), len(uXb)), dtype=int)
-    countXYYb = np.zeros((len(uX), len(uY), len(uYb)), dtype=int)
-
-    print('getting densities')
-    for i in range(len(X_i)):
-
-        x_idx = np.where(uX == X_i[i])[0][0]
-        y_idx = np.where(uY == Y_i[i])[0][0]
-        xb_idx = np.where(uXb == Xb_i[i])[0][0]
-        yb_idx = np.where(uYb == Yb_i[i])[0][0]
-
-        countXYXb[x_idx, y_idx, xb_idx] += 1
-        countXYYb[x_idx, y_idx, yb_idx] += 1
-
-    print('finished counting densities')
-    return countXYXb, countXYYb
 
 
 def compute_average_trajectories(model,   Tper=0.02, Nrepeat=100):

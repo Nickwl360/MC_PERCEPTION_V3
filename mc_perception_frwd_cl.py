@@ -55,33 +55,8 @@ def calc_next_state(model,params,current_state, prog_path):
         return None
     return Result
 
-def get_Pij(model,params):
-    MAXTOP = model.maxtop
-    MAXBOT = model.maxbot
-    Pij = np.zeros((MAXTOP,MAXTOP,MAXBOT,MAXBOT,MAXTOP,MAXTOP,MAXBOT,MAXBOT),dtype=np.float64)
-    for A in range(0,MAXTOP):
-        for B in range(0,MAXTOP):
-            print(A,B)
-            for C in range(0,MAXBOT):
-                for D in range(0,MAXBOT):
-                    state = (A,B,C,D)
-                    P_next = calc_next_state(params, state, perception_cl_prog)
-                    P_next/=np.sum(P_next)
-                    P_next= P_next.reshape((MAXTOP,MAXTOP,MAXBOT,MAXBOT))
-                    Pij[A,B,C,D,:,:,:,:] = P_next
 
-    return Pij
-def renormalizepij(Pijkl):
-    # Create a matrix to store the normalization factors
-    normalizefactors = np.sum(Pijkl, axis=(4, 5, 6, 7))  # Sum over the end state indices
-    # Ensure that the denominator is not zero to avoid division by zero
-    normalizefactors[normalizefactors == 0] = 1.0
-    # Normalize the transition matrix
-    Pijkl /= normalizefactors[:, :, :, :, np.newaxis, np.newaxis, np.newaxis, np.newaxis]
-    #This works, I double checked with the old method
-    return Pijkl
-
-
+#UNUSED
 def faster_function(Parr,ns):
     na,nb,nc,nd=ns
     Parr = Parr[na, nb, nc, nd, :, :, :, :]
@@ -97,20 +72,6 @@ def faster_function(Parr,ns):
         return NAm, NBn, NCo, NDp
     else:
         return 0, 0, 0, 0
-def faster_function_nopij(Parr):
-    randnum = rng.random()
-
-    shape = Parr.shape
-    flat_Parr = Parr.reshape(-1)  # Flatten the Parr array
-    cumsum = np.cumsum(flat_Parr)  # Compute cumulative sum
-    index = np.searchsorted(cumsum, randnum)  # Find index where randnum fits in cumsum
-
-    if index < len(cumsum):
-        NAm, NBn, NCo, NDp = np.unravel_index(index, shape)
-        return NAm, NBn, NCo, NDp
-    else:
-        return 0, 0, 0, 0
-
 def simulation(Nstart,pmnopnorm,Tmax):
     NA = Nstart[0]
     NB = Nstart[1]
@@ -141,6 +102,49 @@ def simulation(Nstart,pmnopnorm,Tmax):
         # print("Last D:", D[len(D) - 1])
         # print(type(A), type(B), type(C),type(D), 'types A-D')
     return A,B,C,D
+def renormalizepij(Pijkl):
+    # Create a matrix to store the normalization factors
+    normalizefactors = np.sum(Pijkl, axis=(4, 5, 6, 7))  # Sum over the end state indices
+    # Ensure that the denominator is not zero to avoid division by zero
+    normalizefactors[normalizefactors == 0] = 1.0
+    # Normalize the transition matrix
+    Pijkl /= normalizefactors[:, :, :, :, np.newaxis, np.newaxis, np.newaxis, np.newaxis]
+    #This works, I double checked with the old method
+    return Pijkl
+def get_Pij(model,params):
+    MAXTOP = model.maxtop
+    MAXBOT = model.maxbot
+    Pij = np.zeros((MAXTOP,MAXTOP,MAXBOT,MAXBOT,MAXTOP,MAXTOP,MAXBOT,MAXBOT),dtype=np.float64)
+    for A in range(0,MAXTOP):
+        for B in range(0,MAXTOP):
+            print(A,B)
+            for C in range(0,MAXBOT):
+                for D in range(0,MAXBOT):
+                    state = (A,B,C,D)
+                    P_next = calc_next_state(params, state, perception_cl_prog)
+                    P_next/=np.sum(P_next)
+                    P_next= P_next.reshape((MAXTOP,MAXTOP,MAXBOT,MAXBOT))
+                    Pij[A,B,C,D,:,:,:,:] = P_next
+
+    return Pij
+
+#UNUSED
+
+
+def faster_function_nopij(Parr):
+    randnum = rng.random()
+
+    shape = Parr.shape
+    flat_Parr = Parr.reshape(-1)  # Flatten the Parr array
+    cumsum = np.cumsum(flat_Parr)  # Compute cumulative sum
+    index = np.searchsorted(cumsum, randnum)  # Find index where randnum fits in cumsum
+
+    if index < len(cumsum):
+        NAm, NBn, NCo, NDp = np.unravel_index(index, shape)
+        return NAm, NBn, NCo, NDp
+    else:
+        return 0, 0, 0, 0
+
 
 def simulation_nopij(model,Nstart,Tmax,params,file_path):
     epsilon1, epsilon2 = 0.0, 0.0

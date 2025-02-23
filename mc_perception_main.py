@@ -2,8 +2,6 @@ import os
 import pandas as pd
 import ast
 from mc_perception_inferred_model_class import brain_model
-import pyopencl as cl
-
 
 MAXTOP = 11
 MAXBOT = 26

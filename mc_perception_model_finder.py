@@ -103,8 +103,8 @@ def cl_likelyhood(params9, count, model):
 
 
 def get_next_prob_arr(params9, state, model, context, queue):
-    MAXTOP = model.maxtop
-    MAXBOT = model.maxbot
+    MAXTOP = model.NR
+    MAXBOT = model.NE
 
     # halpha, ha, hbeta,hb,hgamma,hc,hdelta,hd, kcoop,kcomp,kdu,kud, kx = params
     # device = cl.get_platforms()[0].get_devices()[0]
@@ -163,7 +163,7 @@ def cl_likelyhood_batch_worker(args):
             p_arr = p_arr_cache[state_key]
         else:
             p_arr = get_next_prob_arr(params9, state, model, context, queue)
-            p_arr = p_arr.reshape((model.maxtop, model.maxtop, model.maxbot, model.maxbot))
+            p_arr = p_arr.reshape((model.NR, model.NR, model.NE, model.NE))
             p_arr/=np.sum(p_arr)
             p_arr_cache[state_key] = p_arr
         if p_arr[next_state] > 0 and not np.isnan(p_arr[next_state]):
@@ -187,6 +187,7 @@ def maximize_likelyhood(model, count,initial):
     maxL = minimize(cl_likelyhood_batch, initial, args=(count,model,), method='Nelder-Mead')
 
     return maxL.x
+
 def load_mat_data(file_path):
     mat_contents = sio.loadmat(file_path)
     a = mat_contents['r_li'][0]
