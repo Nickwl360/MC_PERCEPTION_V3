@@ -16,9 +16,9 @@ def get_color_index( X, Y, num_colors ):
 class PlotHandler:
     """Handle plotting operations for analysis results"""
 
-    def __init__(self, analysis_handler):
+    def __init__(self,Analysis):
         """Initialize PlotHandler with analysis handler instance"""
-        self.ah = analysis_handler
+        self.ah = Analysis
         self.dh = data_handler.DataHandler()
         self.prefix = self.ah.prefix
 
@@ -56,7 +56,6 @@ class PlotHandler:
             f"{'  |  '.join(map(lambda x: f'{x.values[0]:.4f}' if isinstance(x, pd.Series) and isinstance(x.values[0], float) else str(x.values[0]) if isinstance(x, pd.Series) else str(x), row1))}")
         print(
             f"{'  |  '.join(map(lambda x: f'{x.values[0]:.4f}' if isinstance(x, pd.Series) and isinstance(x.values[0], float) else str(x.values[0]) if isinstance(x, pd.Series) else str(x), row2))}")
-
     def plot_2d_trajectory(self, tmax=-1):
         if hasattr(self.ah,'long_trajectory'):
             As, Bs, Cs, Ds = self.ah.long_trajectory
@@ -373,41 +372,61 @@ class PlotHandler:
         # fix start view angle
         plt.show()
         self.close_plots()
-    def plot_distributions(self):
-        gamma_dist, lower_dist, ac_dist, ad_dist = self.ah.gamma_dist, self.ah.lower_dist, self.ah.ac_dist, self.ah.ad_dist
-
-        fig, axs = plt.subplots(2, 2, figsize=(15, 10))
-
-        # Plot gamma distribution as a histogram
+    def plot_gamma_distribution(self, axs):
+        gamma_dist = self.ah.gamma_dist
         axs[0, 0].hist(gamma_dist, bins=120, color='blue', alpha=0.7)
         axs[0, 0].set_title('Gamma Distribution')
         axs[0, 0].set_xlabel('Value')
         axs[0, 0].set_ylabel('Frequency')
 
-        # Plot lower distribution as a bar chart
+    def plot_lower_distribution(self, axs):
+        lower_dist = self.ah.lower_dist
         axs[0, 1].bar(range(len(lower_dist)), lower_dist, color='green', alpha=0.7)
         axs[0, 1].set_title('Lower Distribution')
         axs[0, 1].set_xlabel('Index')
         axs[0, 1].set_ylabel('Probability')
 
-        # Plot ac distribution as a 2D graph
+    def plot_ac_distribution(self, axs, fig):
+        ac_dist = self.ah.ac_dist
         cax1 = axs[1, 0].imshow(ac_dist, aspect='auto', cmap='viridis')
         fig.colorbar(cax1, ax=axs[1, 0])
         axs[1, 0].set_title('AC Distribution')
         axs[1, 0].set_xlabel('C Index')
         axs[1, 0].set_ylabel('A Index')
 
-        # Plot ad distribution as a 2D graph
+    def plot_ad_distribution(self, axs, fig):
+        ad_dist = self.ah.ad_dist
         cax2 = axs[1, 1].imshow(ad_dist, aspect='auto', cmap='viridis')
         fig.colorbar(cax2, ax=axs[1, 1])
         axs[1, 1].set_title('AD Distribution')
         axs[1, 1].set_xlabel('D Index')
         axs[1, 1].set_ylabel('A Index')
 
+    def plot_distributions(self):
+        fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+        self.plot_gamma_distribution(axs)
+        self.set_subplot_position([0,0])
+        self.plot_lower_distribution(axs)
+        self.plot_ac_distribution(axs, fig)
+        self.plot_ad_distribution(axs, fig)
         plt.tight_layout()
         self.dh.save_fig('plots', f'{self.prefix}distributions', plt)
         plt.show()
-        self.close_plots()
+
+    def set_subplot_position(self,position):
+        self.position= [position[0],position[1]]
+
 
     def close_plots(self):
         plt.close('all')
+
+
+class Plotter:
+    def __init__(self,rows=1,cols=1,figsize=(15,7)):
+        self.fig, self.axs = plt.subplots(rows, cols, figsize=figsize)
+        self.rows = rows
+        self.cols = cols
+
+        if rows ==1 and cols==1:
+            self.axs= np.array([[self.axs]])
+

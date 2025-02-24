@@ -170,8 +170,8 @@ def pull_traj_givenSi(model, Si):
 
 
 class AnalysisHandler:
-    def __init__(self, raw_trajectory, model,joch_data=False):
-        self.long_trajectory = raw_trajectory[0]
+    def __init__(self,  model,joch_data=False):
+        self.long_trajectory = model.long_trajectory[0]
         #in form (As,Bs,Cs,Ds) ALREADY
         self.prefix = model.prefix
         self.joch_data = joch_data
@@ -219,8 +219,6 @@ class AnalysisHandler:
             self.dh.save_npz('average_trajectories', f'{self.prefix}Tper{self.Tper}Ntraj{self.Ntraj}average_trajectories', **self.average_trajectories)
         if self.gamma_dist is not None:
             self.dh.save_npz('densities', f'{self.prefix}distributions', gamma_dist=self.gamma_dist, lower_dist=self.lower_dist, ac_dist=self.ac_dist, ad_dist=self.ad_dist)
-
-
     # # # Trajectory Analysis # # #
     #############################################################################
     def load_or_generate_dominance_statistics(self):

@@ -114,12 +114,14 @@ def comparitive_workflow():
     control_model_mcdt2 = mc.BrainModel('075', 11, 26, 0.0002)
     control_model_mcdt2.find_model()
     control_model_mcdt2.generate_trajectory((0,0,0,0), 20) #will  give 40mil
-    analysis = AnalysisHandler(control_model_mcdt2.long_trajectory, control_model_mcdt2)
-    plotter= PlotHandler(analysis)
-    plotter.plot_2d_trajectory()
+    #analysis = AnalysisHandler(control_model_mcdt2)
+    #plotter= PlotHandler(analysis)
+    #plotter.plot_2d_trajectory(control_model_mcdt2.long_trajectory)
     #control_model_mcdt2.save_trajectory()
     #traj = control_model_mcdt2.long_trajectory
     #analyze_all(traj,control_model_mcdt2)
+
+
 
     print('FINISHED CONTROL MODEL DT2')
 
