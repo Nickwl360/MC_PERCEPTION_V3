@@ -91,9 +91,11 @@ def cl_likelyhood_batch(params9, count, model):
         with Pool(processes=os.cpu_count()) as p:
             results = p.map(cl_likelyhood_batch_worker, [(params9, count, model, batch) for batch in batches])
         print('Batch likelyhood= ', -1 * sum(results) / total_size, 'time:', time.time() - now)
+        print('Used Params: ', params9)
         return -1 * sum(results) / total_size
 def maximize_likelyhood(model, count,initial):
     maxL = minimize(cl_likelyhood_batch, initial, args=(count,model,), method='Nelder-Mead')
+
     return maxL.x
 
 #for forward modelling
