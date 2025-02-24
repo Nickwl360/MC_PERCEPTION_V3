@@ -255,6 +255,7 @@ class AnalysisHandler:
     def load_or_generate_trajectory_density(self) -> None:
         try:
             self.countXYXb, self.countXYYb = self.dh.load_npz('densities', f'{self.prefix}countsXYXb'), self.dh.load_npz('densities', f'{self.prefix}countsXYYb')
+            self.countXYXb, self.countXYYb = self.countXYXb['counts'], self.countXYYb['counts']
         except FileNotFoundError:
             print('No trajectory density found, calculating now')
             self.countXYXb, self.countXYYb = get_shifted_trajectory_densities(self.shifted_trajectory, self.u_space)
@@ -289,6 +290,8 @@ class AnalysisHandler:
 
         print(np.shape(countXYXb))
         # Restrict to dominant states
+        print(f"Shape of countXYXb before slicing: {countXYXb.shape}")
+
         countXYXb = countXYXb[:, [0, -1], :]  # Keep only the first and last indices for uY
         N = 2
         total_valid_count = np.sum(countXYXb > 0)

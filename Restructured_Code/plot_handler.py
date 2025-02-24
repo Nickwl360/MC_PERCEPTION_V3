@@ -57,7 +57,7 @@ class PlotHandler:
         print(
             f"{'  |  '.join(map(lambda x: f'{x.values[0]:.4f}' if isinstance(x, pd.Series) and isinstance(x.values[0], float) else str(x.values[0]) if isinstance(x, pd.Series) else str(x), row2))}")
 
-    def plot_2d_trajectory(self, tmax):
+    def plot_2d_trajectory(self, tmax=-1):
         if hasattr(self.ah,'long_trajectory'):
             As, Bs, Cs, Ds = self.ah.long_trajectory
             Ts = range(len(As))

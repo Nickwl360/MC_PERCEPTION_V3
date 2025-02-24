@@ -49,7 +49,7 @@ class BrainModel:
         """
         name = f'{self.prefix}params'
         df = self.dh.load_csv('parameters', name)
-        # print(df)
+        print(df)
         # cell = input("Enter the cell in 'row,col' format: ")
         # row, col = map(int, cell.split(','))
         row,col = 0,1
@@ -59,6 +59,8 @@ class BrainModel:
 
         self.initial_guess =   (-10.813039700214725, -10.493275942310733, -8.467808763513434, -3.440305398445934, 0.1,
         1., 2., 0.1, 0.1 ) if initial_guess is None else initial_guess
+
+        self.initial_guess=[-11.12619662,  -9.04741208 ,-12.36690569 ,  -3.9262613 ,  .970342,  1.67499572 ,  2.01375739 , -0.07780541  , 0.41522066]
 
         #check if counts file exists
         counts_path = self.dh._get_path('counts', f'{self.prefix}counts', 'npy')
@@ -77,8 +79,8 @@ class BrainModel:
             # Sample data points based on dt
             a = self.joch_mat_data['r_li'][0][::self.ndt]
             b = self.joch_mat_data['r_li'][1][::self.ndt]
-            c = self.joch_mat_data['r_li'][0][::self.ndt]
-            d = self.joch_mat_data['r_li'][1][::self.ndt]
+            c = self.joch_mat_data['e_li'][0][::self.ndt]
+            d = self.joch_mat_data['e_li'][1][::self.ndt]
             print(len(a))
 
             count = mc.count_transitions((a, b, c, d))
@@ -122,11 +124,13 @@ class BrainModel:
     def save_trajectory(self):
 
         As, Bs, Cs, Ds = self.long_trajectory[0]
+        As, Bs, Cs, Ds = np.array(As).astype(np.int8), np.array(Bs).astype(np.int8), np.array(Cs).astype(
+            np.int8), np.array(Ds).astype(np.int8)
         dict_data = {
-            "A": As.astype(np.int8),
-            "B": Bs.astype(np.int8),
-            "C": Cs.astype(np.int8),
-            "D": Ds.astype(np.int8)
+            "A": As,
+            "B": Bs,
+            "C": Cs,
+            "D": Ds
         }
         self.dh.save_mat("trajectories", f"{self.prefix}trajectory", dict_data, do_compression=True)
         return

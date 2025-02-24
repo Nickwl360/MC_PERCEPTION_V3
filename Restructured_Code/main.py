@@ -96,37 +96,40 @@ def analyze_all(traj,model):
 
 
 def comparitive_workflow():
-    control_model_mc = mc.BrainModel('075', 11, 26, 0.0001)
-    control_model_mc.load_params()
-    control_model_mc.load_trajectory()
-    traj = control_model_mc.long_trajectory
-    analyze_all(traj,control_model_mc)
-
-    print('FINISHED CONTROL MODEL')
-
-    joch_control  = mc.BrainModel('075', 11, 26, 0.0001, joch_data=True)
-    joch_control.load_trajectory()
-    traj = joch_control.long_trajectory
-    analyze_all(traj,joch_control)
-
-    print('FINISHED JOCH CONTROL')
+    # control_model_mc = mc.BrainModel('075', 11, 26, 0.0001)
+    # control_model_mc.load_params()
+    # control_model_mc.load_trajectory()
+    # traj = control_model_mc.long_trajectory
+    # analyze_all(traj,control_model_mc)
+    #
+    # print('FINISHED CONTROL MODEL')
+    #
+    # joch_control  = mc.BrainModel('075', 11, 26, 0.0001, joch_data=True)
+    # joch_control.load_trajectory()
+    # traj = joch_control.long_trajectory
+    # analyze_all(traj,joch_control)
+    #
+    # print('FINISHED JOCH CONTROL')
 
     control_model_mcdt2 = mc.BrainModel('075', 11, 26, 0.0002)
-    control_model_mcdt2.load_params()
-    control_model_mcdt2.generate_trajectory((0,0,0,0), 8000) #will  give 40mil
-    control_model_mcdt2.save_trajectory()
-    traj = control_model_mcdt2.long_trajectory
-    analyze_all(traj,control_model_mcdt2)
+    control_model_mcdt2.find_model()
+    control_model_mcdt2.generate_trajectory((0,0,0,0), 20) #will  give 40mil
+    analysis = AnalysisHandler(control_model_mcdt2.long_trajectory, control_model_mcdt2)
+    plotter= PlotHandler(analysis)
+    plotter.plot_2d_trajectory()
+    #control_model_mcdt2.save_trajectory()
+    #traj = control_model_mcdt2.long_trajectory
+    #analyze_all(traj,control_model_mcdt2)
 
     print('FINISHED CONTROL MODEL DT2')
 
-    joch_control_dt2 = mc.BrainModel('075', 11, 26, 0.0002, joch_data=True)
-    joch_control_dt2.ndt =2
-    joch_control_dt2.load_trajectory()
-    traj = joch_control_dt2.long_trajectory
-    analyze_all(traj,joch_control_dt2)
-
-    print('FINISHED JOCH CONTROL DT2')
+    # joch_control_dt2 = mc.BrainModel('075', 11, 26, 0.0002, joch_data=True)
+    # joch_control_dt2.ndt =2
+    # joch_control_dt2.load_trajectory()
+    # traj = joch_control_dt2.long_trajectory
+    # analyze_all(traj,joch_control_dt2)
+    #
+    # print('FINISHED JOCH CONTROL DT2')
 
 
 
