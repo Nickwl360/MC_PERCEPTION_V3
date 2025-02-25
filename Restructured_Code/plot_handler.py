@@ -402,31 +402,351 @@ class PlotHandler:
         axs[1, 1].set_xlabel('D Index')
         axs[1, 1].set_ylabel('A Index')
 
-    def plot_distributions(self):
-        fig, axs = plt.subplots(2, 2, figsize=(15, 10))
-        self.plot_gamma_distribution(axs)
-        self.set_subplot_position([0,0])
-        self.plot_lower_distribution(axs)
-        self.plot_ac_distribution(axs, fig)
-        self.plot_ad_distribution(axs, fig)
-        plt.tight_layout()
-        self.dh.save_fig('plots', f'{self.prefix}distributions', plt)
-        plt.show()
-
-    def set_subplot_position(self,position):
-        self.position= [position[0],position[1]]
 
 
     def close_plots(self):
         plt.close('all')
 
 
-class Plotter:
-    def __init__(self,rows=1,cols=1,figsize=(15,7)):
-        self.fig, self.axs = plt.subplots(rows, cols, figsize=figsize)
-        self.rows = rows
-        self.cols = cols
+class AnalysisPlot:
+    def __init__(self,nrows,ncols,figsize = (12,9)):
+        self.fig, self.axs = plt.subplots(nrows,ncols,figsize=figsize)
+        self.nrows = nrows
+        self.ncols = ncols
+        self.figsize = figsize
+        self.subplots = []
 
-        if rows ==1 and cols==1:
-            self.axs= np.array([[self.axs]])
+        if nrows == 1 and ncols == 1:
+            self.axs = np.array([[self.axs]])
+        elif nrows ==1 or ncols ==1:
+            self.axs = self.axs.reshape(nrows,ncols)
+
+    def add_subplot(self,subplot):
+        self.subplots.append(subplot)
+
+    def show(self,title = '',save=False,saveName='plot'):
+        for subplot in self.subplots:
+            projection = '3d' if subplot.plot_type in ['average_trajectory3d','density'] else None
+            ax = self.axs[subplot.row,subplot.col]
+            if projection:
+                self.fig.delaxes(ax)
+                if self.ncols==1:
+                    ax = self.fig.add_subplot(self.nrows,self.ncols,subplot.row*subplot.col+subplot.row + 1,projection='3d')
+                else:
+                    ax = self.fig.add_subplot(self.nrows,self.ncols,subplot.row*subplot.col+subplot.col + 1,projection='3d')
+            subplot.apply_plot(ax)
+        self.fig.suptitle(title,fontsize=16)
+        plt.tight_layout()
+        plt.subplots_adjust(right=0.95,wspace=0.3, hspace=0.3)
+        if save:
+            self.save(saveName)
+        plt.show()
+
+    def save(self, filename,dir='data/plots'):
+        os.makedirs(dir, exist_ok=True)
+        self.fig.savefig(os.path.join(dir, filename))
+
+class SubPlot:
+    def __init__(self, position, plot_type,data,uspace=None):
+        self.row = position[0]
+        self.col = position[1]
+        self.data = data
+        self.plot_type = plot_type
+        self.uspace=uspace
+
+    def display_dominance_statistics(self):
+     data = self.data
+     header = ['Duration', 'Variance', 'CV', 'Skewness', 'CC1', 'CC2', 'CC3', 'RevCount', 'Pdouble', 'Pneither']
+     print(f"{'  |  '.join(header)}")
+     print('-' * (len(header) * 10))
+
+     for key in data.keys():
+         if isinstance(data[key], str) and data[key].startswith('[') and data[key].endswith(']'):
+             data[key] = np.array(data[key].replace('[', '').replace(']', '').split()).astype(float)
+
+     row1 = [
+         data["Duration"][0],
+         data["Variance"][0],
+         data["CV"][0],
+         data["Skewness"][0],
+         data["Sequential"][0],
+         data["Sequential"][1],
+         data["Sequential"][2],
+         data["RevCount"],
+         data["Pdouble"],
+         data["Pneither"]
+     ]
+     row2 = [
+         data["Duration"][1],
+         data["Variance"][1],
+         data["CV"][1],
+         data["Skewness"][1],
+         data["Sequential"][0],
+         data["Sequential"][1],
+         data["Sequential"][2],
+         data["RevCount"],
+         data["Pdouble"],
+         data["Pneither"]
+     ]
+
+     row_format = "{:<10} | {:<10} | {:<10} | {:<10} | {:<10} | {:<10} | {:<10} | {:<10} | {:<10} | {:<10}"
+     print(row_format.format(*[f"{x:.4f}" if isinstance(x, float) else str(x) for x in row1]))
+     print(row_format.format(*[f"{x:.4f}" if isinstance(x, float) else str(x) for x in row2]))
+
+
+    def apply_plot(self, ax):
+
+       plot_methods = {
+           'gamma': self.plot_gamma_distribution,
+           'lower': self.plot_lower_distribution,
+           'ac': self.plot_ACAD_distribution,
+           'ad': self.plot_ACAD_distribution,
+           'average_trajectory3d': self.plot_avg_trajectories3d,
+           'average_trajectorytopdown': self.plot_avg_trajectoriestopdown,
+           'density': lambda ax, data: None
+       }
+
+       plot_method = plot_methods.get(self.plot_type)
+       if plot_method:
+          if self.plot_type in ['average_trajectory3d', 'average_trajectorytopdown']:
+              plot_method(ax, self.data, self.uspace)
+          else:
+              plot_method(ax, self.data)
+
+    def plot_gamma_distribution(self,ax,data):
+        ax.hist(data, bins=120, color='blue', alpha=0.7)
+        if self.row ==0:
+            ax.set_title('Gamma Distribution')
+        ax.set_xlabel('Flipping Time')
+        ax.set_ylabel('Frequency')
+        ax.set_xlim([0,9e4])
+        ax.set_ylim([0,200])
+
+    def plot_lower_distribution(self,ax,data):
+        ax.bar(range(len(data)), data, color='green', alpha=0.7)
+        if self.row == 0:
+            ax.set_title('Lower Distribution')
+        ax.set_xlabel('Index')
+        ax.set_ylabel('Probability')
+    def plot_ACAD_distribution(self,ax,data):
+
+        ax.imshow(data, aspect='auto', cmap='viridis')
+        if self.row == 0:
+            ax.set_title(f'{self.plot_type} Distribution')
+        if self.plot_type == 'ac':
+            ax.set_xlabel('C Index')
+        elif self.plot_type == 'ad':
+            ax.set_xlabel('D Index')
+        ax.set_ylabel('A Index')
+
+
+    def plot_avg_trajectoriestopdown(self,ax,data,uspace):
+        """
+        Plot the trajectory in 3D space with colored lines based on input data.
+
+        Parameters:
+        uX, uY, uXb: 1D arrays of X, Y, and Xb values.
+        X_mnpi, Y_mnpi, Xb_mnpi: 4D arrays of trajectory data.
+        NE, NR: Normalizing factors for X and Y axes.
+        """
+        uX, uY, uXb, _ = uspace
+
+
+        X_mnpi = data["X_mnpi"]
+        Y_mnpi = data["Y_mnpi"]
+        Xb_mnpi = data["Xb_mnpi"]
+
+        X_std = data["X_std"]
+        Y_std = data["Y_std"]
+        Xb_std = data["Xb_std"]
+
+        fs = 10  # Font size for labels and ticks
+
+        M = len(uX)
+        P = len(uXb)
+
+        # Create the figure
+        clrmp = plt.get_cmap('coolwarm')
+        # clrmp = plt.get_cmap('jet')
+
+        # num_colors = 256
+        num_colors = 256
+        clrmp_array = clrmp(np.linspace(0, 1, num_colors))
+        maxuX = np.max(uX)
+        maxuY = np.max(uY)
+
+        ax.set_xlim([-0.5, 0.5])
+        ax.set_ylim([-1.1, 1.1])
+
+        # Now get the axis limits to calculate the scale factors
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+
+        # Calculate the data range for each axis
+        x_range = xlim[1] - xlim[0]
+        y_range = ylim[1] - ylim[0]
+        # Scale factors based on axis ranges
+        x_scale = 1 / x_range
+        y_scale = 1 / y_range
+        for m in range(0, M):
+            nX = uX[m]
+            for n in range(0, 2):
+
+                if n == 0:
+                    nY = min(uY)
+                else:
+                    nY = max(uY)
+
+                cix = get_color_index(nX / maxuX, nY / maxuY, num_colors)
+                for p in range(0, P):
+
+                    X_i = np.squeeze(X_mnpi[m, n, p, :])
+                    L = len(X_i)
+                    Y_i = np.squeeze(Y_mnpi[m, n, p, :])
+                    Xb_i = np.squeeze(Xb_mnpi[m, n, p, :])
+
+                    x_std_i = np.squeeze(X_std[m, n, p, :])
+                    y_std_i = np.squeeze(Y_std[m, n, p, :])
+                    xb_std_i = np.squeeze(Xb_std[m, n, p, :])
+
+                    if abs(Y_i[0]) > 0.95:
+                        # ax1
+                        num_points = int(L)
+                        ihalf = int(num_points / 2)
+
+                        ## DIRECTION OF ARROWS
+                        direction2 = np.array([X_i[ihalf + 1] - X_i[ihalf], Y_i[ihalf + 1] - Y_i[ihalf]])
+                        direction2 = np.array([direction2[0] * x_scale, direction2[1] * y_scale])
+
+                        norm2 = np.linalg.norm(direction2)
+                        if norm2 > 0:
+                            direction2 /= norm2
+
+                        length = .08
+                        arrow_V2 = length * direction2
+                        ##
+                        # PLOT 2
+                        if (Xb_i[ihalf]) >= 0.4:
+                            # add a thin line between scatter points
+                            ax.plot(X_i, Y_i, color=clrmp_array[cix, :], linewidth=1.3, zorder=2, alpha=0.9)
+                            ax.scatter(X_i, Y_i, marker='.', color=clrmp_array[cix, :], linewidth=1.3)
+                            ax.quiver(X_i[ihalf], Y_i[ihalf], arrow_V2[0] / x_scale, arrow_V2[1] / y_scale,
+                                       color='black', linewidth=.6, zorder=5, alpha=0.7)
+
+
+
+        ax.set_xlabel('X', fontsize=fs)
+        ax.set_ylabel('Y', fontsize=fs)
+        if self.row==0:
+            ax.set_title('Trajectory flow (top down)', fontsize=fs)
+        # save plot to 'trajectory_plots' dir
+    def plot_avg_trajectories3d(self,ax,data,uspace):
+
+
+        uX, uY, uXb, _ = uspace
+        # print(np.shape(data))
+        # print(data[0])
+
+        X_mnpi = data["X_mnpi"]
+        Y_mnpi = data["Y_mnpi"]
+        Xb_mnpi = data["Xb_mnpi"]
+
+        X_std = data["X_std"]
+        Y_std = data["Y_std"]
+        Xb_std = data["Xb_std"]
+
+        fs = 10  # Font size for labels and ticks
+
+        M = len(uX)
+        P = len(uXb)
+
+        # Create the figure
+        clrmp = plt.get_cmap('coolwarm')
+        # clrmp = plt.get_cmap('jet')
+
+        # num_colors = 256
+        num_colors = 256
+        clrmp_array = clrmp(np.linspace(0, 1, num_colors))
+        maxuX = np.max(uX)
+        maxuY = np.max(uY)
+
+
+        ax.set_xlim([-0.5, 0.5])
+        ax.set_ylim([-1.1, 1.1])
+        ax.set_zlim([0.0, 0.85])
+
+
+        # Now get the axis limits to calculate the scale factors
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        zlim = ax.get_zlim()
+
+        # Calculate the data range for each axis
+        x_range = xlim[1] - xlim[0]
+        y_range = ylim[1] - ylim[0]
+        z_range = zlim[1] - zlim[0]
+
+        # Scale factors based on axis ranges
+        x_scale = 1 / x_range
+        y_scale = 1 / y_range
+        z_scale = 1 / z_range
+
+        for m in range(0, M):
+            nX = uX[m]
+            for n in range(0, 2):
+
+                if n == 0:
+                    nY = min(uY)
+                else:
+                    nY = max(uY)
+
+                cix = get_color_index(nX / maxuX, nY / maxuY, num_colors)
+                for p in range(0, P):
+
+                    X_i = np.squeeze(X_mnpi[m, n, p, :])
+                    L = len(X_i)
+                    Y_i = np.squeeze(Y_mnpi[m, n, p, :])
+                    Xb_i = np.squeeze(Xb_mnpi[m, n, p, :])
+
+                    x_std_i = np.squeeze(X_std[m, n, p, :])
+                    y_std_i = np.squeeze(Y_std[m, n, p, :])
+                    xb_std_i = np.squeeze(Xb_std[m, n, p, :])
+
+                    if abs(Y_i[0]) > 0.95:
+                        # ax1
+                        num_points = int(L)
+                        ax.scatter(X_i, Y_i, Xb_i, marker='.', color=clrmp_array[cix, :], linewidth=.6, zorder=1,
+                                    alpha=0.95)
+                        # thin lines between points plotted
+                        initial_width = 0.3
+                        max_value = 10  # Set the maximum value to cap the linewidth growth
+                        initial_width * (1 + x_std_i + y_std_i + xb_std_i) / max_value
+                        ax.plot(X_i, Y_i, Xb_i, color=clrmp_array[cix, :] * .7, linewidth=0.3, zorder=2, alpha=0.9)
+
+                        # add arrows
+                        for i in range(0, num_points - 2, int(num_points / 4)):
+                            direction = np.array([X_i[i + 1] - X_i[i], Y_i[i + 1] - Y_i[i], Xb_i[i + 1] - Xb_i[i]])
+                            direction = np.array(
+                                [direction[0] * x_scale, direction[1] * y_scale, direction[2] * z_scale])
+                            norm = np.linalg.norm(direction)
+                            if norm > 0:
+                                direction /= norm
+                            length = .08
+
+                            arrow_V = length * direction
+                            if abs(Y_i[i]) <= 0.9:
+                                ax.quiver(X_i[i], Y_i[i], Xb_i[i], arrow_V[0] / x_scale, arrow_V[1] / y_scale,
+                                           arrow_V[2] / z_scale, color=clrmp_array[cix, :], linewidth=2.5, zorder=5)
+                                # ax1.quiver(X_i[i], Y_i[i], Xb_i[i], arrow_V[0]/x_scale, arrow_V[1]/y_scale, arrow_V[2]/z_scale, color='black', linewidth=2.5, zorder=5, alpha=0.8)
+
+        ax.set_xlabel('X', fontsize=fs)
+        ax.set_ylabel('Y', fontsize=fs)
+        ax.set_zlabel('X bar', fontsize=fs)
+        if self.row == 0:
+            ax.set_title('Trajectory flow', fontsize=fs)
+        ax.view_init(elev=38, azim=-41)
+
+
+
+
 

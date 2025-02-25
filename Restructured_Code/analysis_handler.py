@@ -385,23 +385,26 @@ class AnalysisHandler:
         # Calculate gamma distribution
         fliptimes = []
         time = 0
+        #GET STARTING DOMINANCE
         if dataA[2] > dataB[2]:
-            A, B = 1, 0
+            ADominant, BDominant = 1, 0
         else:
-            A, B = 0, 1
+            ADominant, BDominant = 0, 1
+
+        #LOOP THROUGH DATA
         for i in range(3, len(dataA)):
-            if A == 1:
+            if ADominant == 1:
                 if dataA[i] >= dataB[i]:
                     time += 1
                 else:
-                    B, A = 1, 0
+                    BDominant, ADominant = 1, 0
                     fliptimes.append(time)
                     time = 0
-            if B == 1:
+            if BDominant == 1:
                 if dataB[i] >= dataA[i]:
                     time += 1
                 else:
-                    A, B = 1, 0
+                    ADominant, BDominant = 1, 0
                     fliptimes.append(time)
                     time = 0
         gamma_dist = np.array(fliptimes)
@@ -427,3 +430,4 @@ class AnalysisHandler:
         ad_dist /= np.sum(ad_dist)
 
         return gamma_dist, lower_dist, ac_dist, ad_dist
+
