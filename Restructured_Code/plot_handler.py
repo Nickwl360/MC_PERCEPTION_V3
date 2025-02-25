@@ -503,7 +503,8 @@ class SubPlot:
            'ad': self.plot_ACAD_distribution,
            'average_trajectory3d': self.plot_avg_trajectories3d,
            'average_trajectorytopdown': self.plot_avg_trajectoriestopdown,
-           'density': lambda ax, data: None
+           'density': lambda ax, data: None,
+           'basic':self.plot_basic_trajectory
        }
 
        plot_method = plot_methods.get(self.plot_type)
@@ -745,6 +746,19 @@ class SubPlot:
         if self.row == 0:
             ax.set_title('Trajectory flow', fontsize=fs)
         ax.view_init(elev=38, azim=-41)
+    def plot_basic_trajectory(self,data):
+        As, Bs, Cs, Ds = data
+        Ts = range(len(As))
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        tmax = 10e6
+        ax1.plot(Ts[:tmax], As[:tmax], label='A')
+        ax1.plot(Ts[:tmax], Bs[:tmax], label='B')
+        ax1.legend()
+
+        ax2.plot(Ts[:tmax], Cs[:tmax], label='C')
+        ax2.plot(Ts[:tmax], Ds[:tmax], label='D')
+        ax2.legend()
+        plt.show()
 
 
 
