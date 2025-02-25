@@ -60,8 +60,8 @@ class BrainModel:
         self.initial_guess =   (-10.813039700214725, -10.493275942310733, -8.467808763513434, -3.440305398445934, 0.1,
         1., 2., 0.1, 0.1 ) if initial_guess is None else initial_guess
 
-        self.initial_guess=[-11.60666763,  -8.42053855 , -7.73242175 , -2.85202019 ,  0.77998668
- ,  1.83058524 ,  2.56493015  ,-0.0871138   , 0.61750922]
+        self.initial_guess=[-10.11114346 , -9.82787052 , -7.80060414 , -2.64612451 ,  0.82227292,
+   1.9025744   , 2.72783786  , 0.11921726 ,  0.72995217]
         #check if counts file exists
         counts_path = self.dh._get_path('counts', f'{self.prefix}counts', 'npy')
         if os.path.exists(counts_path):
