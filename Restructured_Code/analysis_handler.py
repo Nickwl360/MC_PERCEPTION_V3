@@ -183,7 +183,6 @@ class AnalysisHandler:
 
         self.get_shifted_trajectory_and_space()
         self.dh = data_handler.DataHandler()
-        self.plt = plot_handler.PlotHandler(self)
 
         self.dominance_statistics = None
         self.countXYXb = None

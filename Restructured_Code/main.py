@@ -91,11 +91,6 @@ def analyze_all(traj,model):
     analysis.load_or_generate_avg_trajectory(Tper=.03, Ntraj=10000)
     analysis.load_or_generate_distributions()
 
-    plotter = PlotHandler(analysis)
-    plotter.plot_avg_trajectories()
-    plotter.plot_distributions()
-
-
 def comparitive_workflow():
 
 
@@ -127,6 +122,7 @@ def compare_gammaandlower(MCanalysis,Jochanalysis,save=False):
     d1Analyze = MCanalysis
     jd1Analyze = Jochanalysis
     Plot = AnalysisPlot(2,2)
+
     gammaplotMC = SubPlot([0,0],'gamma',d1Analyze.gamma_dist)
     gammaplotJoch = SubPlot([1,0],'gamma',jd1Analyze.gamma_dist)
     lowerDistMC = SubPlot([0,1],'lower',d1Analyze.lower_dist)
