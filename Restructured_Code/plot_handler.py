@@ -746,11 +746,12 @@ class SubPlot:
         if self.row == 0:
             ax.set_title('Trajectory flow', fontsize=fs)
         ax.view_init(elev=38, azim=-41)
-    def plot_basic_trajectory(self,data):
+    def plot_basic_trajectory(self,ax,data):
+
         As, Bs, Cs, Ds = data
         Ts = range(len(As))
         fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
-        tmax = 10e6
+        tmax = -1
         ax1.plot(Ts[:tmax], As[:tmax], label='A')
         ax1.plot(Ts[:tmax], Bs[:tmax], label='B')
         ax1.legend()

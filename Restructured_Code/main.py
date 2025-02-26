@@ -98,8 +98,7 @@ def comparitive_workflow():
     control_model_mcdt2 = mc.BrainModel('075', 11, 26, 0.0002)
     control_model_mcdt2.load_params()
     control_model_mcdt2.generate_trajectory((0,0,0,0), 8000) #will  give 40mil
-    #p = SubPlot([0,0],'basic',control_model_mcdt2.long_trajectory)
-    #p.apply_plot(None)
+
     #if data looks good generate super long and do below
     control_model_mcdt2.save_trajectory()
 
@@ -184,20 +183,24 @@ def compareDominanceStatistics(MCanalysis,Jochanalysis):
 
 
 def plotting_tester(save=False):
-    d1 = mc.BrainModel('075', 11, 26, 0.0001)
-    jd1 = mc.BrainModel('075', 11, 26, 0.0001, joch_data=True)
+    d1 = mc.BrainModel('075', 11, 26, 0.0002)
+    jd1 = mc.BrainModel('075', 11, 26, 0.0002, joch_data=True)
     d1.load_trajectory()
     jd1.load_trajectory()
     d1Analyze = AnalysisHandler(d1)
     jd1Analyze = AnalysisHandler(jd1)
+    d1Analyze.load_or_generate_dominance_statistics()
+    jd1Analyze.load_or_generate_dominance_statistics()
+    d1Analyze.load_or_generate_avg_trajectory(Tper=.03, Ntraj=10000)
+    jd1Analyze.load_or_generate_avg_trajectory(Tper=.03, Ntraj=10000)
     d1Analyze.load_or_generate_distributions()
     jd1Analyze.load_or_generate_distributions()
 
     compareDominanceStatistics(d1Analyze, jd1Analyze)
-    #compare3dPlots(d1Analyze, jd1Analyze, save=save)
-    #compareTopDownFlows(d1Analyze, jd1Analyze, save=save)
-    #compareACADDistributions(d1Analyze, jd1Analyze, save=save)
-    #compare_gammaandlower(d1Analyze, jd1Analyze, save=save)
+    compare3dPlots(d1Analyze, jd1Analyze, save=save)
+    compareTopDownFlows(d1Analyze, jd1Analyze, save=save)
+    compareACADDistributions(d1Analyze, jd1Analyze, save=save)
+    compare_gammaandlower(d1Analyze, jd1Analyze, save=save)
 
 if __name__ == '__main__':
     #testing
@@ -210,7 +213,7 @@ if __name__ == '__main__':
     #print(model.params)
 
     #if good:
-    comparitive_workflow()
-    #plotting_tester(save=False)
+    #comparitive_workflow()
+    plotting_tester(save=True)
 
 
