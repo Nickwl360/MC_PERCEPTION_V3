@@ -5,6 +5,7 @@ from analysis_handler import AnalysisHandler
 from plot_handler import PlotHandler
 import pandas as pd
 from plot_handler import AnalysisPlot,SubPlot
+#os.environ['PYOPENCL_COMPILER_OUTPUT'] = '1'
 
 
 ############WORK ON PREDEFINE CONFIGS/manual LATER######################
@@ -95,7 +96,6 @@ def comparitive_workflow():
 
 
     control_model_mcdt2 = mc.BrainModel('075', 11, 26, 0.0002)
-    control_model_mcdt2.find_model()
     control_model_mcdt2.load_params()
     control_model_mcdt2.generate_trajectory((0,0,0,0), 8000) #will  give 40mil
     #p = SubPlot([0,0],'basic',control_model_mcdt2.long_trajectory)
