@@ -95,20 +95,20 @@ def comparitive_workflow():
 
 
     control_model_mcdt2 = mc.BrainModel('075', 11, 26, 0.0002)
-    #control_model_mcdt2.find_model()
+    control_model_mcdt2.find_model()
     control_model_mcdt2.load_params()
-    control_model_mcdt2.generate_trajectory((0,0,0,0), 20) #will  give 40mil
-    p = SubPlot([0,0],'basic',control_model_mcdt2.long_trajectory)
-
+    control_model_mcdt2.generate_trajectory((0,0,0,0), 8000) #will  give 40mil
+    #p = SubPlot([0,0],'basic',control_model_mcdt2.long_trajectory)
+    #p.apply_plot(None)
     #if data looks good generate super long and do below
-    #control_model_mcdt2.save_trajectory()
+    control_model_mcdt2.save_trajectory()
 
-    #
-    # analysis = AnalysisHandler(control_model_mcdt2)
-    # analysis.load_or_generate_dominance_statistics()
-    # analysis.load_or_generate_trajectory_density()
-    # analysis.load_or_generate_avg_trajectory(Tper=.03, Ntraj=10000)
-    # analysis.load_or_generate_distributions()
+
+    analysis = AnalysisHandler(control_model_mcdt2)
+    analysis.load_or_generate_dominance_statistics()
+    analysis.load_or_generate_trajectory_density()
+    analysis.load_or_generate_avg_trajectory(Tper=.03, Ntraj=10000)
+    analysis.load_or_generate_distributions()
 
 
     print('FINISHED CONTROL MODEL DT2')
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     #print(model.params)
 
     #if good:
-    #comparitive_workflow()
-    plotting_tester(save=False)
+    comparitive_workflow()
+    #plotting_tester(save=False)
 
 
