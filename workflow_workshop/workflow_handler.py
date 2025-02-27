@@ -2,6 +2,7 @@ import os
 import importlib
 import json
 from typing import Dict, Any, Optional, List, Union
+from plot_handler import PlotHandler
 
 
 class ConfigurationManager:
@@ -131,9 +132,10 @@ class WorkflowManager:
     def initialize_plotting(self):
         """Initialize the plot handler."""
         # Import here to avoid circular imports
-        from plot_handler import PlotHandler
+        if self.analysis_handler is None:
+            self.initialize_analysis()
 
-        self.plot_handler = PlotHandler()
+        self.plot_handler = PlotHandler(self.analysis_handler)
         return self.plot_handler
 
     def save_current_configuration(self, filename: str):
