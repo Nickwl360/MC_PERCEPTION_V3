@@ -183,8 +183,8 @@ def compareDominanceStatistics(MCanalysis,Jochanalysis):
 
 
 def plotting_tester(save=False):
-    d1 = mc.BrainModel('075', 11, 26, 0.0002)
-    jd1 = mc.BrainModel('075', 11, 26, 0.0002, joch_data=True)
+    d1 = mc.BrainModel('075', 11, 26, 0.0005)
+    jd1 = mc.BrainModel('075', 11, 26, 0.0005, joch_data=True)
     d1.load_trajectory()
     jd1.load_trajectory()
     d1Analyze = AnalysisHandler(d1)
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     #print(model.params)
 
     #if good:
-    comparitive_workflow()
-    #plotting_tester(save=True)
+    #comparitive_workflow()
+    plotting_tester(save=True)
 
 
